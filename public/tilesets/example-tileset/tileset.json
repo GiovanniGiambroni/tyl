@@ -1,0 +1,24 @@
+{
+  "id": "basic_platformer",
+  "tileSize": 32,
+  "tiles": [
+    {
+      "id": 0,
+      "name": "empty",
+      "image": "empty.png",
+      "solid": false
+    },
+    {
+      "id": 1,
+      "name": "grass",
+      "image": "grass.png",
+      "solid": true
+    },
+    {
+      "id": 2,
+      "name": "stone",
+      "image": "stone.png",
+      "solid": true
+    }
+  ]
+}
