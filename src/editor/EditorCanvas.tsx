@@ -1,8 +1,13 @@
-import { useRef, useEffect } from "react";
+import React, { useRef, useEffect } from "react";
 import { CanvasRenderer } from "../rendering/CanvasRenderer";
+import { useEditorStore } from "../app/store";
+import { screenToGrid } from "../utils/grid";
 
 export function EditorCanvas(){
     const canvasRef = useRef<HTMLCanvasElement>(null);
+
+    const map = useEditorStore(state => state.map);
+    const paintTile = useEditorStore(state => state.paintTile);
 
     useEffect(() => {
         const canvas = canvasRef.current!;
@@ -13,8 +18,45 @@ export function EditorCanvas(){
         const renderer = new CanvasRenderer(ctx);
 
         renderer.clear(canvas.width, canvas.height);
-        renderer.drawGrid(40, 20, 32, canvas.width, canvas.height);
-    }, []);
+        renderer.drawGrid(
+            map.map.width,
+            map.map.height,
+            map.metadata.tileSize,
+            canvas.width,
+            canvas.height
+        );
 
-    return <canvas ref={canvasRef} />;
+        // Draw tiles (for now just color blocks)
+        const layer = map.map.layers[0];
+        layer.grid.forEach((row, y) => {
+            row.forEach((tile, x) => {
+                if (tile === 0) return;
+                ctx.fillStyle = "#4ade80";
+                ctx.fillRect(
+                    x * map.metadata.tileSize,
+                    y * map.metadata.tileSize,
+                    map.metadata.tileSize,
+                    map.metadata.tileSize
+                );
+            });
+        });
+    }, [map]);
+
+    function handleMouseDown(e: React.MouseEvent<HTMLCanvasElement>){
+        const rect = canvasRef.current!.getBoundingClientRect();
+        const mouseX = e.clientX - rect.left;
+        const mouseY = e.clientY - rect.top;
+
+        const { x, y } = screenToGrid(mouseX, mouseY, map.metadata.tileSize);
+
+        paintTile(x,y);
+    }
+
+    return (
+        <canvas
+        ref={canvasRef}
+        onMouseDown={handleMouseDown}
+        className="cursor-crosshair"
+        />
+    );
 }
