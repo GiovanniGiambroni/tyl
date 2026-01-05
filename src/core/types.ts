@@ -35,3 +35,9 @@ export interface TylMap {
         source: string;
     };
 }
+
+export interface TileDefinition {
+    id: number;
+    name: string;
+    color: string; // temp, for visual representation
+}

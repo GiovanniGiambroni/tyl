@@ -2,6 +2,7 @@ import React, { useRef, useEffect } from "react";
 import { CanvasRenderer } from "../rendering/CanvasRenderer";
 import { useEditorStore } from "../app/store";
 import { screenToGrid } from "../utils/grid";
+import { BASIC_TILESET } from "../core/tileset";
 
 export function EditorCanvas(){
     const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -31,7 +32,11 @@ export function EditorCanvas(){
         layer.grid.forEach((row, y) => {
             row.forEach((tile, x) => {
                 if (tile === 0) return;
-                ctx.fillStyle = "#4ade80";
+                
+                const tileDef = BASIC_TILESET.find(t => t.id === tile);
+                if (!tileDef) return;
+
+                ctx.fillStyle = tileDef.color;
                 ctx.fillRect(
                     x * map.metadata.tileSize,
                     y * map.metadata.tileSize,
