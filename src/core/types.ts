@@ -39,5 +39,5 @@ export interface TylMap {
 export interface TileDefinition {
     id: number;
     name: string;
-    color: string; // temp, for visual representation
+    image: string; // path relative to public/
 }

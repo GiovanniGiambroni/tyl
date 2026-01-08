@@ -3,6 +3,7 @@ import { CanvasRenderer } from "../rendering/CanvasRenderer";
 import { useEditorStore } from "../app/store";
 import { screenToGrid } from "../utils/grid";
 import { BASIC_TILESET } from "../core/tileset";
+import { ImageCache } from "../rendering/ImageCache";
 
 export function EditorCanvas(){
     const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -16,6 +17,7 @@ export function EditorCanvas(){
         canvas.height = 600;
 
         const ctx = canvas.getContext("2d")!;
+        ctx.imageSmoothingEnabled = false;
         const renderer = new CanvasRenderer(ctx);
 
         renderer.clear(canvas.width, canvas.height);
@@ -27,7 +29,8 @@ export function EditorCanvas(){
             canvas.height
         );
 
-        // Draw tiles (for now just color blocks)
+        // Draw tiles
+        const tileSize = map.metadata.tileSize;
         const layer = map.map.layers[0];
         layer.grid.forEach((row, y) => {
             row.forEach((tile, x) => {
@@ -36,13 +39,9 @@ export function EditorCanvas(){
                 const tileDef = BASIC_TILESET.find(t => t.id === tile);
                 if (!tileDef) return;
 
-                ctx.fillStyle = tileDef.color;
-                ctx.fillRect(
-                    x * map.metadata.tileSize,
-                    y * map.metadata.tileSize,
-                    map.metadata.tileSize,
-                    map.metadata.tileSize
-                );
+                const img = ImageCache.load(tileDef.image);
+                
+                ctx.drawImage(img, x * tileSize, y * tileSize, tileSize, tileSize);
             });
         });
     }, [map]);
